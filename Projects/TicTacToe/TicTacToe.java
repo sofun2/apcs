@@ -74,7 +74,7 @@ public class TicTacToe extends JComponent {
 				boolean fl = false;
 				for(int i = 0; i < r; i++) {
 					if(fl) break;
-					for(int j = 0; j < r; j++) {
+					for(int j = 0; j < c; j++) {
 						if(ss[i][j].x < mx && ss[i][j].x + ss[i][j].xsz > mx && ss[i][j].y < my && ss[i][j].y + ss[i][j].ysz > my) {
 							ss[i][j].updateSquare();
 							game.updateBoard();
