@@ -5,7 +5,7 @@ import java.awt.event.*;
 
 public class TicTacToe extends JComponent {
 
-	private static int xdim = 600, ydim = 600, r = 3, c = 3, gameEnd = 0;
+	private static int xdim = 600, ydim = 600, r = 3, c = 3, count = 0;
 	public static Square [][] ss = new Square[r][c];
 
 	
@@ -19,6 +19,64 @@ public class TicTacToe extends JComponent {
 				ss[i][j] = new Square(i * ydim / r, j * xdim / c, ydim / r, xdim / c, "");
 			}
 		}
+	}
+
+	public String checkWinner() {
+
+		// horizontal
+		for(int i = 0; i < r; i++) {
+			String asdf = ss[i][0].s;
+			int j = 1;
+			for(j = 1; j < c; j++) {
+				if(!ss[i][j].s.equals(asdf)) {
+					break;
+				}
+			}
+			if(j == c && !asdf.equals("")) {
+				return asdf;
+			}
+		}
+
+		// vertical
+		for(int i = 0; i < c; i++) {
+			String asdf = ss[0][i].s;
+			int j = 1;
+			for(j = 1; j < r; j++) {
+				if(!ss[j][i].s.equals(asdf)) {
+					break;
+				}
+			}
+			if(j == r && !asdf.equals("")) {
+				return asdf;
+			}
+		}
+
+
+		// main diagonal
+		String asdf = ss[0][0].s;
+		int i = 1;
+		for(i = 1; i < Math.min(r, c); i++) {
+			if(!ss[i][i].s.equals(asdf)) {
+				break;
+			}
+		}
+		if(i == Math.min(r, c)) {
+			return asdf;
+		}
+
+		// second diagonal
+		asdf = ss[0][c - 1].s;
+		i = 1;
+		for(i = 1; i < Math.min(r, c); i++) {
+			if(!ss[i][c - 1 - i].s.equals(asdf)) {
+				break;
+			}
+		}
+		if(i == Math.min(r, c)) {
+			return asdf;
+		}
+
+		return "";
 	}
 
 	public void paintComponent(Graphics g) {
@@ -44,14 +102,23 @@ public class TicTacToe extends JComponent {
 			}
 		}
 
-		if(gameEnd != 0) {
-			String msg = "Player " + "_" + " won!";
+		String res = checkWinner();
+		System.out.println(res);
+		if(count >= r * c) {
+			String msg = "Tie!";
 			g2.drawString(msg, 0 + xdim / 10, (int)(1.1 * ydim));
 		}
-
+		else if(!res.equals("")) {
+			String msg = "Player " + (res.equals("X") ? "1" : "2") + " won!";
+			g2.drawString(msg, 0 + xdim / 10, (int)(1.1 * ydim));
+		}
+		else {
+			;
+		}
 	}
 
 	public void updateBoard() {
+		count++;
 		repaint();
 	}
 
