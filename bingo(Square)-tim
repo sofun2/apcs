@@ -1,0 +1,63 @@
+
+/**
+ * Write a description of class Squares here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+import java.util.*;
+public class Square
+{
+    public int x1, y1, x2, y2;
+    public Boolean a = false;
+    public Num number = new Num();
+    public int value;
+    
+    Square(int x1, int y1, int x2, int y2)
+    {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+        value = number.gen();
+    }
+        
+    public void newNum()
+    {
+       value = number.gen();
+    }
+        
+    public int getNumb()
+    {
+        return value;
+    }
+    
+    public int topLeftX()
+    {
+        return x1;
+    }
+    
+    public int topLeftY()
+    {
+        return y1;
+    }
+    
+    public void change()
+    {
+        a = !a;
+    }
+    
+    public boolean check()
+    {
+        return a;
+    }
+    
+    public boolean checkIn(int mx, int my)
+    {
+        if((mx > x1 && mx < x2) && (my > y1 && my < y2))
+        {
+            return true;
+        }
+        return false;
+    }
+}
