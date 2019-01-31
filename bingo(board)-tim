@@ -1,0 +1,150 @@
+
+/**
+ * Write a description of class Board here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+
+import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.*;
+import java.awt.event.*;
+
+public class Board extends JComponent
+{
+    private static int dim = 400;
+    private static Square[][] player = new Square[5][5];
+    private static Square[][] bot = new Square[5][5];
+    private static ArrayList<Integer> personlist = new ArrayList<Integer>();
+    private static ArrayList<Integer> botlist = new ArrayList<Integer>();
+    public static void main(String args[])
+    {
+        JFrame frame = new JFrame();
+        frame.setSize(dim*2, dim*2);
+        frame.setTitle("Bingo");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        Board bingo = new Board();
+        frame.add(bingo);
+     
+        //board for player
+        for (int i = 50; i < 300; i += 50)
+        {
+            for (int j = 50; j < 300; j += 50)
+            {
+                Square temp = new Square(j, i, j+50, i+50);
+                player[(i/50)-1][(j/50)-1] = temp;
+                personlist.add(temp.getNumb());
+            }
+        }
+        
+        norepeats(personlist);
+        
+        //board for bot
+        for (int i = 50; i < 300; i += 50)
+        {
+            for (int j = 350; j < 600; j += 50)
+            {
+                Square temp = new Square(j, i, j+50, i+50);
+                bot[(i/50)-1][((j-300)/50)-1] = temp;
+            }
+        }
+        
+        class MouseClick implements MouseListener {
+            public void mousePressed(MouseEvent event) {};
+            public void mouseReleased(MouseEvent event) {};
+            public void mouseEntered(MouseEvent event) {};
+            public void mouseClicked(MouseEvent event) {
+                int mx = event.getX();
+                int my = event.getY();
+                for (int i = 0; i < player.length; i++)
+                {
+                    for (int j = 0; j < player[0].length; j++)
+                    {
+                        if(player[i][j].checkIn(mx, my))
+                        {
+                            player[i][j].change();
+                            bingo.update();
+                        }
+                    }
+                }
+            }
+            public void mouseExited(MouseEvent event) {};
+        }
+        
+        MouseListener mouse = new MouseClick();
+        bingo.addMouseListener(mouse);
+        frame.setVisible(true);
+    }
+    
+    public void update() 
+    {
+        repaint();
+    }
+    
+    public void paintComponent(Graphics g1)
+    {
+        Graphics2D g = (Graphics2D) g1;
+         
+        //vert first board
+        for (int i = 50; i <= 300; i += 50)
+        {
+            Line2D.Double line = new Line2D.Double(i, 50, i, 300);
+            g.draw(line);
+        }
+        //hor first board
+        for (int i = 50; i <= 300; i += 50)
+        {
+            Line2D.Double line = new Line2D.Double(50, i, 300, i);
+            g.draw(line);
+        }
+        //vert second board
+        for (int i = 350; i <= 600; i += 50)
+        {
+            Line2D.Double line = new Line2D.Double(i, 50, i, 300);
+            g.draw(line);
+        }
+        //hor second board
+        for (int i = 50; i <= 300; i += 50)
+        {
+            Line2D.Double line = new Line2D.Double(350, i, 600, i);
+            g.draw(line);
+        }
+        
+        
+        Color shade = new Color(127, 127, 127, 100);
+        Color text = new Color(0, 0, 0);
+        for (int i = 0; i < player.length; i++)
+        {
+            for (int j = 0; j < player[0].length; j++)
+            {
+                g.setColor(text);
+                String num = String.valueOf(player[i][j].getNumb());
+                g.drawString(num, player[i][j].topLeftX()+18, player[i][j].topLeftY()+29);
+                if(player[i][j].check())
+                {
+                    g.setColor(shade);
+                    g.fillRect(player[i][j].topLeftX(), player[i][j].topLeftY(), 50, 50);
+                }
+            }
+        }
+    }
+    
+    public static void norepeats(ArrayList<Integer> list)
+    {
+        for (int i = 0; i < list.size(); i++)
+        {
+            System.out.println(list.get(i));
+            for (int j = 0; j < list.size(); j++)
+            {
+                if (list.get(i) == list.get(j))
+                {
+                    player[(j-1)/5][(j-1)%5].newNum();
+                    list.set(j, player[j/5][(j%5)-1].getNumb());
+                }
+            }
+        }
+    }
+}
