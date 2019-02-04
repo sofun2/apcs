@@ -7,7 +7,8 @@
  */
 
 import java.util.*;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.event.*;
@@ -17,8 +18,11 @@ public class Board extends JComponent
     private static int dim = 400;
     private static Square[][] player = new Square[5][5];
     private static Square[][] bot = new Square[5][5];
-    private static ArrayList<Integer> personlist = new ArrayList<Integer>();
-    private static ArrayList<Integer> botlist = new ArrayList<Integer>();
+    public static ArrayList<Integer> personlist = new ArrayList<Integer>();
+    public static ArrayList<Integer> botlist = new ArrayList<Integer>();
+    public static ArrayList<Integer> gamelist = new ArrayList<Integer>();
+    public static int nextnumber;
+    public static Square generator = new Square(0, 0, 0, 0);
     public static void main(String args[])
     {
         JFrame frame = new JFrame();
@@ -27,7 +31,6 @@ public class Board extends JComponent
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         Board bingo = new Board();
-        frame.add(bingo);
      
         //board for player
         for (int i = 50; i < 300; i += 50)
@@ -35,12 +38,11 @@ public class Board extends JComponent
             for (int j = 50; j < 300; j += 50)
             {
                 Square temp = new Square(j, i, j+50, i+50);
+                temp.norepeats(personlist);
                 player[(i/50)-1][(j/50)-1] = temp;
                 personlist.add(temp.getNumb());
             }
         }
-        
-        norepeats(personlist);
         
         //board for bot
         for (int i = 50; i < 300; i += 50)
@@ -48,9 +50,18 @@ public class Board extends JComponent
             for (int j = 350; j < 600; j += 50)
             {
                 Square temp = new Square(j, i, j+50, i+50);
+                temp.norepeats(botlist);
                 bot[(i/50)-1][((j-300)/50)-1] = temp;
+                botlist.add(temp.getNumb());
             }
         }
+        
+        for (int i = 0; i < personlist.size(); i++)
+        {
+            System.out.println(botlist.get(i));
+        }
+        
+        frame.add(bingo);
         
         class MouseClick implements MouseListener {
             public void mousePressed(MouseEvent event) {};
@@ -77,6 +88,8 @@ public class Board extends JComponent
         MouseListener mouse = new MouseClick();
         bingo.addMouseListener(mouse);
         frame.setVisible(true);
+        
+        bingo.next();
     }
     
     public void update() 
@@ -130,19 +143,63 @@ public class Board extends JComponent
                 }
             }
         }
+        
+        for (int i = 0; i < bot.length; i++)
+        {
+            for (int j = 0; j < bot[0].length; j++)
+            {
+                g.setColor(text);
+                String num = String.valueOf(bot[i][j].getNumb());
+                g.drawString(num, bot[i][j].topLeftX()+18, bot[i][j].topLeftY()+29);
+                if(bot[i][j].check())
+                {
+                    g.setColor(shade);
+                    g.fillRect(bot[i][j].topLeftX(), bot[i][j].topLeftY(), 50, 50);
+                }
+            }
+        }
+        
+        g.setColor(text);
+        String gametext = "The next number is: " + String.valueOf(nextnumber);
+        g.drawString(gametext, 300, 350);
     }
     
-    public static void norepeats(ArrayList<Integer> list)
+    public void next()
     {
-        for (int i = 0; i < list.size(); i++)
+        try
         {
-            System.out.println(list.get(i));
-            for (int j = 0; j < list.size(); j++)
+            Thread.sleep(100);
+            generator.newNum();
+            generator.norepeats(gamelist);
+            nextnumber = generator.getNumb();
+            gamelist.add(nextnumber);
+            CheckProgress();
+            repaint();
+            next();
+        }
+        catch(InterruptedException e) {}        
+    }
+    
+    public void CheckProgress()
+    {
+        for (int i = 0; i < bot.length; i++)
+        {
+            for (int j = 0; j < bot[0].length; j++)
             {
-                if (list.get(i) == list.get(j))
+                if(bot[i][j].getNumb() == nextnumber)
                 {
-                    player[(j-1)/5][(j-1)%5].newNum();
-                    list.set(j, player[j/5][(j%5)-1].getNumb());
+                    bot[i][j].change();
+                }
+            }
+        }
+        
+        for (int i = 0; i < player.length; i++)
+        {
+            for (int j = 0; j < player[0].length; j++)
+            {
+                if(player[i][j].getNumb() == nextnumber)
+                {
+                    player[i][j].autochange();
                 }
             }
         }
