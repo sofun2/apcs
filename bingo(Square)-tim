@@ -10,6 +10,7 @@ public class Square
 {
     public int x1, y1, x2, y2;
     public Boolean a = false;
+    public Boolean b = false;
     public Num number = new Num();
     public int value;
     
@@ -45,6 +46,11 @@ public class Square
     public void change()
     {
         a = !a;
+    }
+    
+    public void autochange()
+    {
+        b = !b;
     }
     
     public boolean check()
